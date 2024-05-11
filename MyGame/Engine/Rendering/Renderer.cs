@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using MyGame.Engine.Rendering.Shaders;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 
@@ -24,7 +25,7 @@ public static class Renderer
     /// <summary>
     /// The shader we are using for everything 
     /// </summary>
-    private static Shader _shader = null!;
+    private static MainShader _shader = null!;
 
     /// <summary>
     /// The debug callback for opengl, keep a global reference to make
@@ -120,8 +121,7 @@ public static class Renderer
         GL.Gl.Enable(EnableCap.Multisample);
         
         // compile and use the shader 
-        _shader = new Shader();
-        GL.Gl.UseProgram(_shader.Id);
+        _shader = new MainShader();
     }
     
     public static void SubmitLight(in Vector3 position, in Vector3 color)
@@ -150,6 +150,7 @@ public static class Renderer
     public static void Render(Matrix4x4 projection, Matrix4x4 view)
     {
         var shader = _shader;
+        GL.Gl.UseProgram(shader.Id);
         
         // clear everything 
         GL.Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);

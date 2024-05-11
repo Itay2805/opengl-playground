@@ -47,34 +47,10 @@ public class Shader : IDisposable
     
     public uint Id { get; }
 
-    public int UniformBaseColorFactor { get; }
-    public int UniformMetallicFactor { get; }
-    public int UniformRoughnessFactor { get; }
-    public int UniformAlphaCutoff { get; set; }
-    public int UniformNormalScale { get; set; }
-    
-    
-    public int UniformBaseColorTexture { get; }
-    public int UniformNormalTexture { get; }
-    public int UniformMetallicRoughnessTexture { get; }
-
-    
-    public int UniformAttributes { get; }
-    public int UniformVertexAttributes { get; }
-
-    public int UniformLightPosition { get; }
-    public int UniformLightColor { get; }
-
-    public int UniformViewPosition { get; }
-    
-    public int UniformModel { get; }
-    public int UniformView { get; }
-    public int UniformProjection { get; }
-    
-    public Shader()
+    public Shader(string name)
     {
-        var vertex = GetShader("MyGame.Engine.Rendering.Shader.vert");
-        var fragment = GetShader("MyGame.Engine.Rendering.Shader.frag");
+        var vertex = GetShader($"MyGame.Engine.Rendering.Shaders.{name}.vert");
+        var fragment = GetShader($"MyGame.Engine.Rendering.Shaders.{name}.frag");
 
         // compile and link the shaders that we generated
         var vertexShader = CompileShader(vertex, ShaderType.VertexShader);
@@ -88,7 +64,7 @@ public class Shader : IDisposable
                 GL.Gl.AttachShader(Id, vertexShader);
                 GL.Gl.AttachShader(Id, fragmentShader);
                 GL.Gl.LinkProgram(Id);
-
+                
                 if (GL.Gl.GetProgram(Id, ProgramPropertyARB.LinkStatus) != 1)
                 {
                     GL.Gl.GetProgramInfoLog(Id, out var infoLog);
@@ -105,29 +81,6 @@ public class Shader : IDisposable
             // need to cleanup in here
             GL.Gl.DeleteShader(vertexShader);
         }
-        
-        // now get all the locations we need
-        UniformBaseColorFactor = GL.Gl.GetUniformLocation(Id, "u_baseColorFactor");
-        UniformMetallicFactor = GL.Gl.GetUniformLocation(Id, "u_metallicFactor");
-        UniformRoughnessFactor = GL.Gl.GetUniformLocation(Id, "u_roughnessFactor");
-        UniformAlphaCutoff = GL.Gl.GetUniformLocation(Id, "u_alphaCutoff");
-        UniformNormalScale = GL.Gl.GetUniformLocation(Id, "u_normalScale");
-
-        UniformBaseColorTexture = GL.Gl.GetUniformLocation(Id, "u_baseColorTexture");
-        UniformNormalTexture = GL.Gl.GetUniformLocation(Id, "u_normalTexture");
-        UniformMetallicRoughnessTexture = GL.Gl.GetUniformLocation(Id, "u_metallicRoughnessTexture");
-
-        UniformAttributes = GL.Gl.GetUniformLocation(Id, "u_attributes");
-        UniformVertexAttributes = GL.Gl.GetUniformLocation(Id, "u_vertexAttributes");
-
-        UniformLightPosition = GL.Gl.GetUniformLocation(Id, "u_lightPosition");
-        UniformLightColor = GL.Gl.GetUniformLocation(Id, "u_lightColor");
-        
-        UniformViewPosition = GL.Gl.GetUniformLocation(Id, "u_viewPosition");
-        
-        UniformModel = GL.Gl.GetUniformLocation(Id, "u_model");
-        UniformView = GL.Gl.GetUniformLocation(Id, "u_view");
-        UniformProjection = GL.Gl.GetUniformLocation(Id, "u_projection");
     }
     
     private void ReleaseUnmanagedResources()

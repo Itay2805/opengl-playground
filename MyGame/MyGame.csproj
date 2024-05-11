@@ -25,10 +25,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Include="Engine\Rendering\Shaders\MainShader.frag" />
+      <EmbeddedResource Include="Engine\Rendering\Shaders\MainShader.vert" />
       <None Remove="Engine\Rendering\Shader.frag" />
-      <EmbeddedResource Include="Engine\Rendering\Shader.frag" />
       <None Remove="Engine\Rendering\Shader.vert" />
-      <EmbeddedResource Include="Engine\Rendering\Shader.vert" />
     </ItemGroup>
 
 </Project>
