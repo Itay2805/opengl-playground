@@ -13,6 +13,13 @@ public record PbrMetallicRoughness
 
 }
 
+public enum AlphaMode
+{
+    Opaque,
+    Mask,
+    Blend
+}
+
 public record Material
 {
     
@@ -20,5 +27,9 @@ public record Material
     public PbrMetallicRoughness PbrMetallicRoughness { get; init; } = new();
     
     public Texture? NormalTexture { get; init; }
+    public float NormalScale { get; init; }
+    public AlphaMode AlphaMode { get; init; } = AlphaMode.Opaque;
+    public float AlphaCutoff { get; init; } = 0.5f;
+    public bool DoubleSided { get; init; } = false;
 
 }

@@ -102,7 +102,7 @@ public static class Engine
         World.Import<Ecs.Monitor>();
         World.Import<Transform>();
         
-        // Gltf.Load("thing.gltf");
+        Gltf.Load("/home/tomato/checkouts/glTF-Sample-Models/2.0/Sponza/glTF/Sponza.gltf");
 
         var render = World.Query<EcsMesh, EcsTransform>();
         
@@ -112,8 +112,8 @@ public static class Engine
         var camera = new PerspectiveCamera(1280f / 720f, MathF.PI / 180 * 45f, 100.0f, 0.1f)
         {
             View = Matrix4x4.CreateLookAt(
-                new Vector3(3f), 
-                new Vector3(0f), 
+                new Vector3(3f, 1.7f, 0f), 
+                new Vector3(0f, 1.7f, 0f), 
                 Vector3.UnitY
             )
         };

@@ -1,3 +1,4 @@
+using MyGame.Engine.Rendering;
 using Silk.NET.OpenGL;
 
 namespace MyGame.Engine;

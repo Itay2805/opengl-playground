@@ -1,9 +1,7 @@
-using System.Buffers;
 using System.IO.MemoryMappedFiles;
 using Silk.NET.OpenGL;
-using Buffer = MyGame.Engine.Rendering.Buffer;
 
-namespace MyGame.Engine;
+namespace MyGame.Engine.Rendering;
 
 public class BufferView : IDisposable
 {

@@ -9,6 +9,7 @@ public enum ShaderAttributes
     BaseColorTexture = 1 << 0,
     NormalTexture = 1 << 1,
     MetallicRoughnessTexture = 1 << 2,
+    AlphaMask = 1 << 3
 }
 
 [Flags]
@@ -49,6 +50,8 @@ public class Shader : IDisposable
     public int UniformBaseColorFactor { get; }
     public int UniformMetallicFactor { get; }
     public int UniformRoughnessFactor { get; }
+    public int UniformAlphaCutoff { get; set; }
+    public int UniformNormalScale { get; set; }
     
     
     public int UniformBaseColorTexture { get; }
@@ -107,6 +110,8 @@ public class Shader : IDisposable
         UniformBaseColorFactor = GL.Gl.GetUniformLocation(Id, "u_baseColorFactor");
         UniformMetallicFactor = GL.Gl.GetUniformLocation(Id, "u_metallicFactor");
         UniformRoughnessFactor = GL.Gl.GetUniformLocation(Id, "u_roughnessFactor");
+        UniformAlphaCutoff = GL.Gl.GetUniformLocation(Id, "u_alphaCutoff");
+        UniformNormalScale = GL.Gl.GetUniformLocation(Id, "u_normalScale");
 
         UniformBaseColorTexture = GL.Gl.GetUniformLocation(Id, "u_baseColorTexture");
         UniformNormalTexture = GL.Gl.GetUniformLocation(Id, "u_normalTexture");

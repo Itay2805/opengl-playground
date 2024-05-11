@@ -69,7 +69,6 @@ public class MeshPrimitive : IDisposable
         // so we make sure it is zero in the view that we get 
         //
         Indices = indices;
-        if (indices.ByteOffset != 0) throw new InvalidOperationException();
         GL.Gl.VertexArrayElementBuffer(Id, indices.BufferView.Id);
 
         //

@@ -3,6 +3,7 @@
 #define HAS_BASE_COLOR_TEXTURE          (1 << 0)
 #define HAS_NORMAL_TEXTURE              (1 << 1)
 #define HAS_METALLIC_ROUGHNESS_TEXTURE  (1 << 2)
+#define HAS_ALPHA_MASK                  (1 << 3)
 
 // the inputs from the vertex
 in vec3 worldPos;
@@ -16,6 +17,8 @@ out vec4 fragColor;
 uniform vec4 u_baseColorFactor;
 uniform float u_metallicFactor;
 uniform float u_roughnessFactor;
+uniform float u_alphaCutoff;
+uniform float u_normalScale;
 
 // the textures
 uniform sampler2D u_baseColorTexture;
@@ -70,29 +73,45 @@ void main() {
     float metallic = u_metallicFactor;
     float roughness = u_roughnessFactor;
     float ao = 0.0;
+
+    float alpha = u_baseColorFactor.a;
     
+    // modify the albedo by the texture 
     if ((u_attributes & HAS_BASE_COLOR_TEXTURE) != 0) {
-        albedo *= texture(u_baseColorTexture, texCoord).rgb;
+        vec4 color = texture(u_baseColorTexture, texCoord);
+        albedo *= color.rgb;
+        alpha *= color.a;
     }
-    
+
+    // Handle alpha masking based on the cutoff value 
+    if ((u_attributes & HAS_ALPHA_MASK) != 0) {
+        if (alpha < u_alphaCutoff)
+            discard;
+    }
+
+    // modify the metallic and roughness values by the texture
     if ((u_attributes & HAS_METALLIC_ROUGHNESS_TEXTURE) != 0) {
         vec4 color = texture(u_metallicRoughnessTexture, texCoord);
         metallic *= color.b;
         roughness *= color.g;
     }
     
+    // if we have a normal map then use the calculated TBN 
+    // to get the normal, otherwise just get the one from the 
+    // vertex shader
     vec3 finalNormal;
     if ((u_attributes & HAS_NORMAL_TEXTURE) != 0) {
-        // we have a normal map, use it 
-        float u_normalScale = 0.9;
-        
         finalNormal = texture(u_normalTexture, texCoord).rgb * 2.0 - 1.0;
         finalNormal *= vec3(u_normalScale, u_normalScale, 1.0);
         finalNormal = normalize(finalNormal);
         finalNormal = normalize(tbn * finalNormal);
     } else {
-        // use the normal passed from the vertex shader
         finalNormal = normal;
+    }
+    
+    // flip the normal if not front facing 
+    if (!gl_FrontFacing) {
+        finalNormal = -finalNormal;
     }
     
     vec3 N = normalize(finalNormal);

@@ -111,6 +111,10 @@ public static class Renderer
         GL.Gl.Enable(EnableCap.DepthTest);
         GL.Gl.DepthFunc(DepthFunction.Lequal);
         
+        // enable back-face culling
+        GL.Gl.Enable(EnableCap.CullFace);
+        GL.Gl.CullFace(TriangleFace.Back);
+        
         // compile and use the shader 
         _shader = new Shader();
         GL.Gl.UseProgram(_shader.Id);
@@ -207,13 +211,28 @@ public static class Renderer
                 GL.Gl.ActiveTexture(TextureUnit.Texture0 + textureSlot);
                 GL.Gl.BindTexture(GLEnum.Texture2D, material.NormalTexture.Id);
                 GL.Gl.Uniform1(shader.UniformNormalTexture, textureSlot);
+                GL.Gl.Uniform1(shader.UniformNormalScale, material.NormalScale);
                 textureSlot += 1;
+            }
+
+            // alpha mode 
+            if (material.AlphaMode == AlphaMode.Mask)
+            {
+                attributes |= ShaderAttributes.AlphaMask;
+                GL.Gl.Uniform1(shader.UniformAlphaCutoff, material.AlphaCutoff);
             }
 
             //
             // Update the attributes 
             //
             GL.Gl.Uniform1(shader.UniformAttributes, (int)attributes);
+
+            // disable culling if double sided
+            // we assume most materials are not double sided
+            if (material.DoubleSided)
+            {
+                GL.Gl.Disable(EnableCap.CullFace);
+            }
             
             // and now over all the meshes that use that material
             // and render them one by one 
@@ -242,8 +261,14 @@ public static class Renderer
                 var type = (DrawElementsType)primitive.Indices.ComponentType;
                 unsafe
                 {
-                    GL.Gl.DrawElements(primitive.Mode, primitive.Indices.Count, type, null);
+                    GL.Gl.DrawElements(primitive.Mode, primitive.Indices.Count, type, (void*)primitive.Indices.ByteOffset);
                 }
+            }
+            
+            // enable it again
+            if (material.DoubleSided)
+            {
+                GL.Gl.Enable(EnableCap.CullFace);
             }
             
             // clear the list to save on space 

@@ -77,7 +77,9 @@ public record GltfMaterial
     public GltfNormalTextureInfo? NormalTexture { get; set; } = null;
     public GltfTextureInfo? EmissiveTexture { get; set; } = null;
     public float[] EmissiveFactor { get; set; } = [0f, 0f, 0f];
-
+    [JsonConverter(typeof(JsonStringEnumConverter))] public AlphaMode AlphaMode { get; set; } = AlphaMode.Opaque;
+    public float AlphaCutoff { get; set; } = 0.5f;
+    public bool DoubleSided { get; set; } = false;
 }
 
 public record GltfImage
@@ -228,17 +230,23 @@ public class Gltf
             }
             
             Texture? normal = null;
+            var normalScale = 1.0f;
             if (material.NormalTexture != null)
             {
                 if (material.NormalTexture.TexCoord != 0) 
                     throw new NotSupportedException("Multiple TexCoords are not supported currently");
                 normal = textures[material.NormalTexture.Index];
+                normalScale = material.NormalTexture.Scale;
             }
             
             materials[i] = new Material
             {
                 PbrMetallicRoughness = pbr,
                 NormalTexture = normal,
+                NormalScale = normalScale,
+                AlphaMode = material.AlphaMode,
+                AlphaCutoff = material.AlphaCutoff,
+                DoubleSided = material.DoubleSided,
                 Name = material.Name
             };
         }
