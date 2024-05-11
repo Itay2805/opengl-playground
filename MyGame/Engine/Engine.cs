@@ -18,6 +18,8 @@ public static class Engine
     /// </summary>
     public static World World { get; private set; }
 
+    public static Window Window { get; private set; }
+    
     /// <summary>
     /// Should debug rendering happen
     /// </summary>
@@ -72,6 +74,7 @@ public static class Engine
         // Initialize the rendering
         //
         var window = CreateWindow();
+        Window = window;
         
         // finally initialize the renderer
         Renderer.Init();
@@ -110,6 +113,7 @@ public static class Engine
         World.Import<Ecs.Monitor>();
         World.Import<Transform>();
         World.Import<Graphics>();
+        World.Import<Controller>();
 
         //
         // Load something in 
@@ -119,6 +123,7 @@ public static class Engine
         // simple camera
         var camera = World.Entity("Camera");
         camera.Set(new EcsPosition { Value = new Vector3(0.1f) });
+        camera.Set(new EcsRotation());
         camera.Set(new EcsCamera(float.DegreesToRadians(45f), 1280f / 720f, 0.1f, 100f));
         camera.Set(new EcsLookAt { Target = new Vector3(0f, 0f, 0f) });
         
