@@ -9,13 +9,13 @@ namespace MyGame.Engine.Systems;
 public struct Transform : IFlecsModule
 {
 
-    public unsafe void InitModule(ref World world)
+    public void InitModule(ref World world)
     {
         world.Module<Transform>();
         
         // A system that adds the transform component to anything that has a 
         // position or rotation or scale 
-        world.Routine("EcsAddTransform")
+        world.Routine("AddTransform")
             .Kind(Ecs.PostLoad)
             .Write<EcsTransform>()
             .Without<EcsTransform>()
@@ -30,7 +30,7 @@ public struct Transform : IFlecsModule
                 }
             });
 
-        world.Routine("EcsApplyTransform")
+        world.Routine("ApplyTransform")
             .Kind(Ecs.OnValidate)
             .With<EcsTransform>().Out()
             .With<EcsTransform>().In().Optional().Parent().Cascade()

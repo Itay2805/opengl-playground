@@ -106,7 +106,7 @@ void main() {
         finalNormal = normalize(finalNormal);
         finalNormal = normalize(tbn * finalNormal);
     } else {
-        finalNormal = normal;
+        finalNormal = normalize(normal);
     }
     
     // flip the normal if not front facing 
@@ -114,7 +114,7 @@ void main() {
         finalNormal = -finalNormal;
     }
     
-    vec3 N = normalize(finalNormal);
+    vec3 N = finalNormal;
     vec3 V = normalize(u_viewPosition - worldPos);
 
     vec3 F0 = vec3(0.04);

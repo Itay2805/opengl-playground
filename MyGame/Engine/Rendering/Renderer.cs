@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
@@ -120,14 +121,14 @@ public static class Renderer
         GL.Gl.UseProgram(_shader.Id);
     }
     
-    public static void SetLight(Light light)
+    public static void SubmitLight(in Vector3 position, in Vector3 color)
     {
         var shader = _shader;
-        GL.Gl.Uniform3(shader.UniformLightPosition, light.Position);
-        GL.Gl.Uniform3(shader.UniformLightColor, light.Color);
+        GL.Gl.Uniform3(shader.UniformLightPosition, position);
+        GL.Gl.Uniform3(shader.UniformLightColor, color);
     }
 
-    public static void SubmitMesh(Mesh mesh, Matrix4x4 transform)
+    public static void SubmitMesh(Mesh mesh, in Matrix4x4 transform)
     {
         foreach (var primitive in mesh.Primitives)
         {
@@ -143,7 +144,7 @@ public static class Renderer
     /// <summary>
     /// Perform the full render cycle with the given camera
     /// </summary>
-    public static void Render(Camera camera)
+    public static void Render(Matrix4x4 projection, Matrix4x4 view)
     {
         var shader = _shader;
         
@@ -151,17 +152,14 @@ public static class Renderer
         GL.Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         
         // Update the camera in the shader 
-        var projection = camera.Projection;
-        var view = camera.View;
         unsafe
         {
-            // TODO: only update the projection if changed from the last time 
             GL.Gl.UniformMatrix4(shader.UniformProjection, 1, false, (float*)&projection);
             GL.Gl.UniformMatrix4(shader.UniformView, 1, false, (float*)&view);
         }
 
         // camera position
-        GL.Gl.Uniform3(shader.UniformViewPosition, view.M13, view.M23, view.M33);
+        GL.Gl.Uniform3(shader.UniformViewPosition, view.Translation);
         
         // Go over all the materials 
         var materialsToRemove = new List<Material>();

@@ -79,12 +79,12 @@ public static class Engine
         //
         // add reflection for components
         //
-        
+
         World.Component<EcsPosition>()
             .Member<float>("X")
             .Member<float>("Y")
             .Member<float>("Z");
-        
+
         World.Component<EcsRotation>()
             .Member<float>("Roll (X)")
             .Member<float>("Pitch (Y)")
@@ -95,34 +95,37 @@ public static class Engine
             .Member<float>("Y")
             .Member<float>("Z");
         
+        World.Component<EcsLight>()
+            .Member<float>("R")
+            .Member<float>("G")
+            .Member<float>("B");
+
+        World.Component<EcsLookAt>()
+            .Member<EcsPosition>("Target");
+
         //
         // Import all the modules we need for flecs
         //
         World.Set<Native.EcsRest>(default);
         World.Import<Ecs.Monitor>();
         World.Import<Transform>();
-        
-        Gltf.Load("/home/tomato/checkouts/glTF-Sample-Models/2.0/Sponza/glTF/Sponza.gltf");
+        World.Import<Graphics>();
 
-        var render = World.Query<EcsMesh, EcsTransform>();
-        
         //
-        // Create a simple camera
+        // Load something in 
         //
-        var camera = new PerspectiveCamera(1280f / 720f, MathF.PI / 180 * 45f, 100.0f, 0.1f)
-        {
-            View = Matrix4x4.CreateLookAt(
-                new Vector3(3f, 1.7f, 0f), 
-                new Vector3(0f, 1.7f, 0f), 
-                Vector3.UnitY
-            )
-        };
+        Gltf.Load("/home/tomato/checkouts/glTF-Sample-Models/2.0/Avocado/glTF/Avocado.gltf");
 
-        Renderer.SetLight(new Light
-        {
-            Color = new Vector3(150.0f),
-            Position = new Vector3(3f, 0f, 0f)
-        });
+        // simple camera
+        var camera = World.Entity("Camera");
+        camera.Set(new EcsPosition { Value = new Vector3(0.1f) });
+        camera.Set(new EcsCamera(float.DegreesToRadians(45f), 1280f / 720f, 0.1f, 100f));
+        camera.Set(new EcsLookAt { Target = new Vector3(0f, 0f, 0f) });
+        
+        // simple light
+        var light = World.Entity("Light");
+        light.Set(new EcsPosition(-3f, 0f, -0.5f));
+        light.Set(new EcsLight{ Color = new Vector3(150f) });
         
         // set some color
         GL.Gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -132,17 +135,7 @@ public static class Engine
         //
         while (!Glfw.WindowShouldClose(window))
         {
-            // Progress the ECS properly
             World.Progress();
-
-            // submit all the meshes for rendering 
-            render.Each((ref EcsMesh mesh, ref EcsTransform transform) =>
-            {
-                Renderer.SubmitMesh(mesh.Mesh, transform.Value);
-            });
-            Renderer.Render(camera);
-            
-            // get events and present everything 
             Glfw.SwapBuffers(window);
             Glfw.PollEvents();
         }
