@@ -72,7 +72,7 @@ void main() {
     vec3 albedo = u_baseColorFactor.rgb;
     float metallic = u_metallicFactor;
     float roughness = u_roughnessFactor;
-    float ao = 0.0;
+    float ao = 0.5;
 
     float alpha = u_baseColorFactor.a;
     

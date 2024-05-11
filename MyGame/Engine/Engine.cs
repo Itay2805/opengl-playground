@@ -49,6 +49,7 @@ public static class Engine
         Glfw.WindowHint(Hint.ContextVersionMajor, 4);
         Glfw.WindowHint(Hint.ContextVersionMinor, 5);
         Glfw.WindowHint(Hint.OpenglProfile, Profile.Core);
+        Glfw.WindowHint(Hint.Samples, 4);
 
         var window = Glfw.CreateWindow(1280, 720, "Hello world", GLFW.Monitor.None, Window.None);
         if (window == Window.None)
@@ -118,19 +119,21 @@ public static class Engine
         //
         // Load something in 
         //
-        Gltf.Load("/home/tomato/checkouts/glTF-Sample-Models/2.0/Avocado/glTF/Avocado.gltf");
+        Gltf.Load("/home/tomato/checkouts/glTF-Sample-Models/2.0/Sponza/glTF/Sponza.gltf");
 
         // simple camera
+        var player = World.Entity("Player");
+        
         var camera = World.Entity("Camera");
-        camera.Set(new EcsPosition { Value = new Vector3(0.1f) });
-        camera.Set(new EcsRotation());
+        camera.ChildOf(player);
+        camera.Set(new EcsPosition { Value = new Vector3(0, -1.7f, 0) });
+        camera.Set(new EcsRotation { Value = new Vector3(0, float.DegreesToRadians(90), 0) });
         camera.Set(new EcsCamera(float.DegreesToRadians(45f), 1280f / 720f, 0.1f, 100f));
-        camera.Set(new EcsLookAt { Target = new Vector3(0f, 0f, 0f) });
         
         // simple light
         var light = World.Entity("Light");
-        light.Set(new EcsPosition(-3f, 0f, -0.5f));
-        light.Set(new EcsLight{ Color = new Vector3(150f) });
+        light.Set(new EcsPosition(-3f, 1f, -0.5f));
+        light.Set(new EcsLight{ Color = new Vector3(50f) });
         
         // set some color
         GL.Gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);

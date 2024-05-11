@@ -28,36 +28,35 @@ void main() {
     mat4 modelView = u_view * u_model;
     
     // pass the world position
-    worldPos = vec3(modelView * vec4(a_position, 1.0f));
+    worldPos = vec3(u_model * vec4(a_position, 1.0f));
     
     // if we have normal textures then take the tangent and 
     // transform it properly 
+
+    // pass the simple normal instead
+    mat3 normalMat = transpose(inverse(mat3(u_model)));
+    normal = normalMat * a_normal;
+    
     if ((u_attributes & HAS_NORMAL_TEXTURE) != 0) {
         vec3 t;
         vec3 b;
-        vec3 n = normalize(mat3(modelView) * a_normal);
         if ((u_vertexAttributes & HAS_TANGENTS) != 0) {
             // use the tangets given from the vertex data
-            t = normalize(mat3(modelView) * a_tangent.xyz);
-            b = cross(n, t) * a_tangent.w;
+            t = normalize(normalMat * a_tangent.xyz);
+            b = cross(normal, t) * a_tangent.w;
         } else {
             // Generate a default tangent and bitangent
-            vec3 c1 = cross(n, vec3(0.0, 0.0, 1.0));
-            vec3 c2 = cross(n, vec3(0.0, 1.0, 0.0));
+            vec3 c1 = cross(normal, vec3(0.0, 0.0, 1.0));
+            vec3 c2 = cross(normal, vec3(0.0, 1.0, 0.0));
             if (length(c1) > length(c2)) {
                 t = c1;
             } else {
                 t = c2;
             }
             t = normalize(t);
-            b = normalize(cross(n, t));
+            b = normalize(cross(normal, t));
         }
-        tbn = mat3(t, b, n);
-        
-    } else {
-        // pass the simple normal instead
-        mat3 normalModel = mat3(transpose(inverse(modelView)));
-        normal = normalModel * a_normal;
+        tbn = mat3(t, b, normal);
     }
     
     // pass if has texture
@@ -66,5 +65,5 @@ void main() {
     }
     
     // and finally pass the glPosition
-    gl_Position = u_projection * vec4(worldPos, 1.0f);
+    gl_Position = u_projection * u_view * vec4(worldPos, 1.0f);
 }

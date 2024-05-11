@@ -116,6 +116,9 @@ public static class Renderer
         GL.Gl.Enable(EnableCap.CullFace);
         GL.Gl.CullFace(TriangleFace.Back);
         
+        // enable multi-sampling
+        GL.Gl.Enable(EnableCap.Multisample);
+        
         // compile and use the shader 
         _shader = new Shader();
         GL.Gl.UseProgram(_shader.Id);
